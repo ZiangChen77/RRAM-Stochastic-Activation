@@ -32,11 +32,13 @@ This framework models the stochastic computing paradigm for 1T1R RRAM arrays, wh
 
 ### Step 1: Clone the Repository
 git clone https://github.com/ZiangChen77/RRAM-Stochastic-Activation
+
 git cd RRAM-Stochastic-Activation
 
 ### Step 2: Create a Virtual Environment (Recommended)
 # For Anaconda users
 conda create -n rram_stochastic python=3.9
+
 conda activate rram_stochastic
 
 # Or using venv
