@@ -20,13 +20,12 @@ This framework models the stochastic computing paradigm for 1T1R RRAM arrays, wh
   * numpy >= 1.21.0
   * scipy >= 1.7.0
   * matplotlib >= 3.5.0
+  * tqdm >= 4.64.0
 
 ### Hardware Requirements
 * **Standard Desktop:** No non-standard hardware is required.
 * **CPU:** Standard Intel/AMD processor (suitable for running the Demo and evaluations).
 * **GPU (Optional but Recommended):** NVIDIA GPU with CUDA support is highly recommended for running the full PreActResNet-18 training on CIFAR-10.
-
-
 ---
 
 ## 2. Installation Guide
@@ -48,6 +47,7 @@ source venv/bin/activate  # On Windows use: venv\Scripts\activate
 pip install -r requirements.txt
 
 * **Typical Installation Time:** Less than 2 minutes on a standard desktop computer.
+
 ---
 
 ## 3. Demo (Quick Run)
@@ -60,8 +60,7 @@ python run_demo.py
 ### Expected Output:
 1. **Console Output:**
    [INFO] Initializing RRAM stochastic activation demo...
-   [INFO] Simulating 1000 MAC outputs through 1T1R array...
-   [INFO] Applying hardware noise-induced Sigmoid activation...
+   [INFO] Running stochastic hardware simulation with 5000 samples per point...
    [INFO] Successfully mapped Batch Normalization parameters:
           - Comparator Bias (V_bias): 0.24 V
           - Read Voltage (V_r): 0.40 V
@@ -75,16 +74,22 @@ python run_demo.py
 
 This framework allows users to perform hardware-aware neural network training and evaluation (PreActResNet-18 on CIFAR-10) embedded with the RRAM stochastic behavioral model.
 
-### Dataset Preparation
-The CIFAR-10 dataset will be automatically downloaded to the './data' directory upon running the script. No manual download is required.
+### Model 1: Compact Stochastic Behavioral Model for RRAM
+To run the physical dynamic noise simulation of the memristor (Supplementary Software 1):
+python compact_rram_stochastic_model.py
 
-### Evaluate Pre-trained Model (91.1% Accuracy)
+* This generates the dynamic noise trace plot saved as 'Dynamic_Noise_Model.png'.
+
+### Model 2: Hardware-Aware Neural Network Simulation (Supplementary Software 2)
+The CIFAR-10 dataset will be automatically downloaded to the './data' directory upon running the script.
+
+#### Evaluate Pre-trained Model (91.1% Accuracy)
 To evaluate the network using the pre-trained weights under the stochastic activation framework:
 python main.py --mode evaluation --checkpoint ./checkpoints/pretrained_resnet18.pth
 
 * **Expected Run Time:** ~1 minute on a GPU, ~10 minutes on a CPU.
 
-### Hardware-Aware Training
+#### Hardware-Aware Training
 To train the PreActResNet-18 from scratch with the RRAM noise-induced Sigmoid activation and BN-to-circuit mapping:
 python main.py --mode train --lr 0.1 --epochs 200 --batch_size 128
 
@@ -107,5 +112,5 @@ This project is licensed under the MIT License.
 
 ## Citation
 If you find this work or code useful for your research, please cite our paper:
-"Fusion of neural nonlinearity with synaptic weighting in memristive crossbar array via controlled signal-to-noise ratio"
 
+"Fusion of neural nonlinearity with synaptic weighting in memristive crossbar array via controlled signal-to-noise ratio"
