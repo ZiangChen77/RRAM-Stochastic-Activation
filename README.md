@@ -37,12 +37,12 @@ git clone https://github.com/ZiangChen77/RRAM-Stochastic-Activation
 cd RRAM-Stochastic-Activation
 
 ### Step 2: Create a Virtual Environment (Recommended)
-For Anaconda users:
+###For Anaconda users:
 conda create -n rram_stochastic python=3.9
 
 conda activate rram_stochastic
 
-Or using venv:
+###Or using venv:
 python -m venv venv
 
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
