@@ -62,13 +62,18 @@ python run_demo.py
 ### Expected Output:
 1. **Console Output:**
    [INFO] Initializing RRAM stochastic activation demo...
+   
    [INFO] Running stochastic hardware simulation with 5000 samples per point...
+   
    [INFO] Successfully mapped Batch Normalization parameters:
+   
           - Comparator Bias (V_bias): 0.24 V
+   
           - Read Voltage (V_r): 0.40 V
+   
    [SUCCESS] Demo completed. Plot saved as 'stochastic_activation_demo.png'.
 
-2. **Generated File:** A plot named 'stochastic_activation_demo.png' will be saved in the root directory, showing the simulated cumulative distribution function (CDF) of RRAM noise matching the theoretical Sigmoid curve.
+3. **Generated File:** A plot named 'stochastic_activation_demo.png' will be saved in the root directory, showing the simulated cumulative distribution function (CDF) of RRAM noise matching the theoretical Sigmoid curve.
 * **Expected Run Time:** Less than 5 seconds on a standard CPU.
 ---
 
