@@ -31,7 +31,7 @@ This framework models the stochastic computing paradigm for 1T1R RRAM arrays, wh
 ## 2. Installation Guide
 
 ### Step 1: Clone the Repository
-git clone https://github.com/PCL-IME/RRAM-Stochastic-Activation.
+git clone https://github.com/ZiangChen77/RRAM-Stochastic-Activation
 git cd RRAM-Stochastic-Activation
 
 ### Step 2: Create a Virtual Environment (Recommended)
