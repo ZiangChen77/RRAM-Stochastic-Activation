@@ -1,78 +1,114 @@
+"""Illustrate stochastic comparator sampling and a logistic approximation."""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 
+# Adjustable demonstration parameters. These illustrative voltages are not
+# extracted device measurements or a calibrated read-voltage-to-BN mapping.
+DEMO_PARAMETERS = {
+    'seed': 1234,
+    'v_bias': 0.24,       # Comparator threshold (V)
+    'noise_std': 0.425,   # Gaussian input-noise standard deviation (V)
+    'num_samples': 5000, # Binary decisions per fixed input value
+    'input_min': -1.5,   # Comparator input range (V)
+    'input_max': 1.5,
+    'num_inputs': 100,
+    'sigmoid_gain': 4.0, # Logistic gain (1/V)
+}
+
+# Plot settings are exposed here for easy customization.
+PLOT_PARAMETERS = {
+    'figure_size': (8, 5.5),
+    'font_family': 'Arial',
+    'title_fontsize': 12,
+    'label_fontsize': 11,
+    'tick_fontsize': 10,
+    'legend_fontsize': 9,
+    'logistic_color': '#d62728',
+    'sample_color': '#1f77b4',
+    'bias_color': '#7f7f7f',
+    'line_width': 2.0,
+    'marker_size': 15,
+    'legend_location': 'lower right',
+    'output_file': 'stochastic_activation_demo.png',
+    'dpi': 300,
+}
+
+
 def simulate_stochastic_activation():
-    """Simulates the physical fusion of MAC and Sigmoid activation using RRAM noise."""
-    print("[INFO] Initializing RRAM stochastic activation demo...")
-
-    # ==========================================
-    # Parameters for Curve Fitting
-    # ==========================================
-    # The slope factor in the theoretical Sigmoid (k=4.0) dictates the required noise level.
-    # Mathematically, the required noise_std ≈ 1.702 / k to perfectly match the Sigmoid curve.
-
-    v_bias = 0.24  # Comparator Bias Voltage V_bias (Determines the center point)
-    v_read = 0.40  # Read Voltage V_r (Example circuit control knob)
-    noise_std = 0.425  # RRAM Read Noise Standard Deviation (Determines the slope)
-
-    num_samples = 5000  # Number of stochastic samples per input point for smooth estimation
-
-    # Simulate input range (Normalized MAC output)
-    v_input = np.linspace(-1.5, 1.5, 100)
+    """Estimate binary-output probabilities at fixed comparator inputs."""
+    params = DEMO_PARAMETERS
+    style = PLOT_PARAMETERS
+    rng = np.random.default_rng(params['seed'])
+    v_bias = params['v_bias']
+    noise_std = params['noise_std']
+    num_samples = params['num_samples']
+    v_input = np.linspace(
+        params['input_min'], params['input_max'], params['num_inputs']
+    )
     activation_probability = []
 
-    print(f"[INFO] Running stochastic hardware simulation with {num_samples} samples per point...")
+    print('[INFO] Initializing stochastic comparator demo...')
+    print('[INFO] Illustrative demonstration parameters:')
+    print(f"       - Random seed: {params['seed']}")
+    print(f'       - Comparator threshold (V_bias): {v_bias} V')
+    print(f'       - Gaussian noise standard deviation: {noise_std} V')
+    print(f'       - Binary samples per fixed input: {num_samples}')
 
     for v in v_input:
-        # Physical process: MAC result (v) is perturbed by RRAM intrinsic Gaussian noise
-        noisy_signals = v + np.random.normal(0, noise_std, num_samples)
-
-        # Hardware decision: If noisy signal > V_bias, output 1 (Activation)
+        noisy_signals = v + rng.normal(0, noise_std, num_samples)
         comparator_outputs = (noisy_signals > v_bias).astype(float)
+        # The sample mean estimates a probability for this fixed input.
+        activation_probability.append(np.mean(comparator_outputs))
 
-        # The mean of comparator outputs represents the physical activation probability
-        prob = np.mean(comparator_outputs)
-        activation_probability.append(prob)
+    # Gaussian comparator noise gives a normal-CDF response. A logistic curve
+    # with gain about 1.702 / noise_std approximates, rather than equals, it.
+    logistic_approximation = 1.0 / (
+        1.0 + np.exp(-params['sigmoid_gain'] * (v_input - v_bias))
+    )
 
-    # ==========================================
-    # Theoretical Target Function
-    # ==========================================
-    # The theoretical Sigmoid activation function used in the neural network model
-    theoretical_sigmoid = 1.0 / (1.0 + np.exp(-4.0 * (v_input - v_bias)))
+    with plt.rc_context({
+        'font.family': style['font_family'],
+        'mathtext.fontset': 'stix',
+        'xtick.labelsize': style['tick_fontsize'],
+        'ytick.labelsize': style['tick_fontsize'],
+    }):
+        fig, ax = plt.subplots(figsize=style['figure_size'])
+        ax.plot(
+            v_input, logistic_approximation,
+            color=style['logistic_color'], linestyle='--',
+            linewidth=style['line_width'], label='Logistic approximation',
+        )
+        ax.scatter(
+            v_input, activation_probability,
+            color=style['sample_color'], s=style['marker_size'], alpha=0.8,
+            label='Stochastic comparator sampling',
+        )
+        ax.axvline(
+            x=v_bias, color=style['bias_color'], linestyle=':',
+            label=rf'Comparator threshold $V_{{\mathrm{{bias}}}}$ = {v_bias} V',
+        )
+        ax.set_title(
+            'Stochastic comparator activation', fontsize=style['title_fontsize']
+        )
+        ax.set_xlabel('Comparator input (V)', fontsize=style['label_fontsize'])
+        ax.set_ylabel('Output probability', fontsize=style['label_fontsize'])
+        ax.tick_params(direction='out')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.grid(True, linestyle='--', alpha=0.25)
+        ax.legend(
+            loc=style['legend_location'], fontsize=style['legend_fontsize'],
+            frameon=False,
+        )
+        ax.set_ylim(-0.05, 1.05)
+        fig.tight_layout()
+        fig.savefig(style['output_file'], dpi=style['dpi'])
+        plt.close(fig)
 
-    # ==========================================
-    # Result Visualization (Pure English)
-    # ==========================================
-    plt.figure(figsize=(8, 5.5))
-
-    # Theoretical curve (Red Dashed Line)
-    plt.plot(v_input, theoretical_sigmoid, 'r--', label='Theoretical Sigmoid Activation', linewidth=2)
-
-    # Stochastic simulation results (Blue Dots)
-    plt.scatter(v_input, activation_probability, color='#3A86A8', s=15,
-                label='Physical RRAM Noise-induced Activation\n(Stochastic Simulation)', alpha=0.8)
-
-    # Vertical line representing the comparator bias
-    plt.axvline(x=v_bias, color='gray', linestyle=':', label=f'Comparator Bias $V_{{bias}}$ = {v_bias}V')
-
-    plt.title('Physical Fusion of MAC and Sigmoid via RRAM Noise', fontsize=12, fontweight='bold')
-    plt.xlabel('Normalized Input Voltage $V_{in}$ (V)', fontsize=10)
-    plt.ylabel('Activation Probability / Output', fontsize=10)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend(loc='lower right', fontsize=9)
-    plt.ylim(-0.05, 1.05)
-    plt.tight_layout()
-
-    # Save the output figure
-    output_fig = 'stochastic_activation_demo.png'
-    plt.savefig(output_fig, dpi=300)
-
-    print(f"[INFO] Successfully mapped Batch Normalization parameters:")
-    print(f"       - Comparator Bias (V_bias): {v_bias} V")
-    print(f"       - Read Voltage (V_r): {v_read} V")
-    print(f"[SUCCESS] Demo completed. Plot saved as '{output_fig}'.")
+    print(f"[SUCCESS] Demo completed. Plot saved as '{style['output_file']}'.")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     simulate_stochastic_activation()

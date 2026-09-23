@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 class Memristor:
-    def __init__(self, w, Wmin=-1.0, Wmax=1.0, Gmin=1e-6, Gmax=1e-5, alpha_p=4, alpha_d=4, Np=20, Nd=20, gamma_p=0.5, gamma_d=0.5, gamma_gmin=0.05, gamma_gmax=0.05, mode='lin'):
+    def __init__(self, w, Wmin=-1.0, Wmax=1.0, Gmin=2.0e-6, Gmax=3.2e-5, alpha_p=4, alpha_d=4, Np=20, Nd=20, gamma_p=0.5, gamma_d=0.5, gamma_gmin=0.05, gamma_gmax=0.05, mode='lin'):
         self.mode = mode
         if alpha_p == 0.0 and alpha_d == 0.0:
             self.Gmin = Gmin
@@ -196,8 +196,8 @@ if __name__ == "__main__":
         'mode': 'lin',
         'Wmin': -1.0,
         'Wmax': 1.0,
-        'Gmin': 1e-6,
-        'Gmax': 1e-5,
+        'Gmin': 2.0e-6,
+        'Gmax': 3.2e-5,
         'alpha_p': 4, #Norlinear of LTP
         'alpha_d': 4,
         'Np': 20, #Number of pulse, HRS->LRS

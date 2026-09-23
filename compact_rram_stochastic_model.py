@@ -45,6 +45,8 @@ low_base_mean = (V_READ / R_DEV) * (1 - OFFSET_MEAN_R)
 # Pre-calculate fluctuation scales
 low_mean_fluctuation = low_base_mean * OFFSET_BASE_MEAN
 high_mean_fluctuation = high_base_mean * OFFSET_BASE_MEAN
+p_high_to_low = 1.0 - np.exp(-TSAMPLE / tau_ON)
+p_low_to_high = 1.0 - np.exp(-TSAMPLE / tau_OFF)
 
 # Initialize state-dependent statistical means
 low_curr_mean = np.random.normal(low_base_mean, low_mean_fluctuation)
@@ -60,24 +62,24 @@ for i in range(num_samples):
 
     if current_state == 'high':
         # Transition condition: High -> Low (driven by tau_ON)
-        if rand_num > (TSAMPLE / tau_ON):
+        if rand_num < p_high_to_low:
             current_state = 'low'
             low_curr_mean = np.random.normal(low_base_mean, low_mean_fluctuation)
-            low_curr_std = high_curr_mean * NOISE_AMPLITUDE
+            low_curr_std = low_curr_mean * NOISE_AMPLITUDE
             current_trace[i] = np.random.normal(low_curr_mean, low_curr_std)
         else:
-            high_curr_std = low_curr_mean * NOISE_AMPLITUDE
+            high_curr_std = high_curr_mean * NOISE_AMPLITUDE
             current_trace[i] = np.random.normal(high_curr_mean, high_curr_std)
 
     elif current_state == 'low':
         # Transition condition: Low -> High (driven by tau_OFF)
-        if rand_num > (TSAMPLE / tau_OFF):
+        if rand_num < p_low_to_high:
             current_state = 'high'
             high_curr_mean = np.random.normal(high_base_mean, high_mean_fluctuation)
-            high_curr_std = low_curr_mean * NOISE_AMPLITUDE
+            high_curr_std = high_curr_mean * NOISE_AMPLITUDE
             current_trace[i] = np.random.normal(high_curr_mean, high_curr_std)
         else:
-            low_curr_std = high_curr_mean * NOISE_AMPLITUDE
+            low_curr_std = low_curr_mean * NOISE_AMPLITUDE
             current_trace[i] = np.random.normal(low_curr_mean, low_curr_std)
 
 # ==========================================

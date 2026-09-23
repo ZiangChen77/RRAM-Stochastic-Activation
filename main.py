@@ -87,7 +87,7 @@ else:
 memristor_parameters = {
         'mode': 'lin',
         'Wmin': -1.0, 'Wmax': 1.0,
-        'Gmin': 3.0e-6, 'Gmax': 2.4e-5,
+        'Gmin': 2.0e-6, 'Gmax': 3.2e-5,
         'alpha_p': 0.0, 'alpha_d': 0.0,
         'Np':8, 'Nd': 8,
         'gamma_p': 0.0, 'gamma_d': 0.0,
@@ -196,5 +196,4 @@ plt.ylabel('Accuracy [%]')
 plt.legend()
 plt.savefig(f'./train_results_resnet/{filename}_accuracy_bs_repeats.svg')
 plt.close()
-
 
