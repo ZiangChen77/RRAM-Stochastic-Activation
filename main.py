@@ -169,7 +169,7 @@ for epoch in range(start_epoch, max_epoch):
 print('==> Finished Training.')
 
 for i, acc in enumerate(acc_train_epoch):
-    print(f'Epoch {i+1}: trainset (ReLU_BS) {acc*100:.3f}%, testset (ReLU_T) {acc_test_hp_epoch[i]*100:.3f}%, testset (ReLU_BS) {acc_test_bs_epoch[i]*100:.3f}%')
+    print(f'Epoch {i+1}: trainset (Sigmoid_BS) {acc*100:.3f}%, testset (Sigmoid_BS) {acc_test_hp_epoch[i]*100:.3f}%, testset (Sigmoid_BS) {acc_test_bs_epoch[i]*100:.3f}%')
 
 
 num_repeats = 50
